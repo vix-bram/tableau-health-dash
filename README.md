@@ -9,3 +9,6 @@ Which hospitals, states, and ownership types have more readmissions than expecte
 3. **Ownership:** a comparison across hospital ownership types (non-profit, for-profit, government and others), with a minimum-discharges filter. (Every hospital in the readmissions program is an acute care hospital, so there are no hospital types to compare.)
 4. **Star rating:** average ratio by overall star rating, with the hospital count on each bar so readers see the sample size.
 5. **Find a hospital:** pick one hospital to see its ratio for each condition next to its state average and the 1.0 line.
+
+#### Acknowledgements
+Claude by Anthropic was used to help write code and guide me thrugh this project.
