@@ -45,3 +45,30 @@ Source: `scripts/download_data.py`, then `scripts/explore_data.py`. Exact file v
 - **All six of the most extreme ratios are hip/knee replacement.** The lowest (0.47 to 0.56) are specialist orthopaedic and surgical hospitals, such as Kansas City Orthopaedic Institute and Salina Surgical Hospital. The highest (1.57 to 1.63) are general hospitals. That could be a finding about specialist hospitals. Check it on Day 3.
 - **Nationally, every condition is about 50/50.** 47 to 50% of hospitals are above 1.0, and the average ratio is about 1.00 for all six conditions. That follows from how CMS calibrates "expected", which centres the national picture on 1.0. So View 2 will look flat, and saying "condition X is the problem" isn't supported. The real variation is between states, ownership types and individual hospitals. Consider reworking View 2 to show the *spread* per condition (how far the worst hospitals sit above 1.0) rather than the share above 1.0.
 - MySQL: database `hospital_readmissions`, user `readmissions` (rights on this database only). Credentials are in `.env`, which is git-ignored.
+
+## Day 3: SQL analysis and export (Oct 18)
+
+Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates the view, runs `sql/01` to `05` and exports `data/tableau/hospital_condition.csv`. These are observations, not findings yet. Check them against the Tableau views on Day 4.
+
+### Decisions
+- **Which rows count.** Every query uses hospitals that match General Information, the same rows as the Tableau view, so Day 4 can be reconciled exactly. The view has 18,210 rows from 3,035 hospitals. The 20 unmatched hospitals (120 rows) are left out because they have no name, state or ownership.
+- **Numbers on matched rows** (use these in the README): **11,681** rows have a ratio (11,720 in the whole file), **3,668** are volume-suppressed (3,683 in the whole file), and all 377 partial-period rows are matched.
+- **State cutoff: at least 10 hospitals with a ratio**, applied per condition. 238 of 306 state × condition cells are shown, covering about 97% of rows. Seven small states have fewer than 10 hospitals with a ratio even for all conditions together: DC, DE and VT (6 each), ND (7), AK and WY (8 each) and RI (9), so they will be blank on the map.
+- **Ranking cutoff: at least 100 discharges.** That is about 4× CMS's floor of 25, and every condition still has 250 or more eligible hospitals. A cutoff of 200 would have left bypass surgery with only 110. Volume-suppressed rows have NULL discharges, so they can never be ranked.
+- **Weighted averages** only use rows whose discharges are published. Query 03 therefore also shows a simple average over the same rows, which separates the effect of weighting from the effect of dropping small hospitals.
+- **The view has helper columns:** `above_1` (1/0/NULL, so `AVG(above_1)` = share above 1.0) and `rankable` (100 or more discharges).
+
+### What the numbers show
+1. **Conditions differ in spread, not in share above 1.0.** Every condition has 47 to 50% of hospitals above 1.0 and an average of about 1.00. The spread varies widely, though. The standard deviation is 0.156 for hip/knee compared with 0.046 for COPD, and 23% of hip/knee hospitals are more than 10% above expected compared with 3% for COPD. **This answers the View 2 question: show the spread per condition**, not the share above 1.0.
+2. **States vary much more than conditions.** The share of results above 1.0 runs from 65% (NJ) and 63% (MA) down to 19% (MT) and 20% (ID, UT). At first glance, high states cluster in the Northeast and South, and low ones in the Mountain West and Northwest. Check this on the map.
+3. **Proprietary (for-profit) hospitals sit highest:** 55% above 1.0, a simple average of 1.017 and a weighted average of 1.022, compared with 46.5% and 0.998 for private non-profits. **Physician-owned hospitals are lowest** (simple 0.954, weighted 0.862). Federal (13 hospitals) and Tribal (5 hospitals, no published discharges) are too small to chart on their own.
+4. **Star ratings line up step by step.** The share above 1.0 falls from 73% at 1 star to 31% at 5 stars, and the average falls from 1.048 to 0.966. But the overall star rating includes a readmission measure group, so part of this link is built in. Say so in the README. 197 hospitals with a ratio have no star rating. The other 184 unrated hospitals in the notes above have no ratio at all.
+5. **The hip/knee specialist pattern holds at 100 or more discharges.** At least 6 of the best 10 are orthopaedic or surgical specialty hospitals, and 4 are physician-owned, which probably explains finding 3. They are high-volume (578 to 2,393 discharges). The worst 10 are all general hospitals with only 101 to 292 discharges. Specialty and volume are mixed together, so don't claim a cause.
+6. **The suppressed small hospitals average below 1.0.** In most ownership groups the average over counted rows is higher than the simple average. Weighting then pulls it down again, so large hospitals look slightly better than mid-sized ones. The choice of average shifts the story a little.
+
+### To handle on Day 4
+- View 2: chart the spread (for example share above 1.10 and below 0.90, or a box plot) rather than the share above 1.0.
+- View 1: footnote the seven blank states.
+- View 3: combine Federal and Tribal into "Other" or footnote them.
+- The best/worst lists include two partial-period ratios (Ascension St Vincent Evansville for hip/knee, Kootenai Health for pneumonia). Footnote them if they appear.
+- Don't open and save the CSV in Excel, because it drops the leading zeros from `facility_id`.
