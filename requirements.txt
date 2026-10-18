@@ -1,1 +1,4 @@
 pandas
+sqlalchemy
+pymysql
+python-dotenv

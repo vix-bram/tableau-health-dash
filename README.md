@@ -11,4 +11,4 @@ Which hospitals, states, and ownership types have more readmissions than expecte
 5. **Find a hospital:** pick one hospital to see its ratio for each condition next to its state average and the 1.0 line.
 
 #### Acknowledgements
-Claude by Anthropic was used to help write code and guide me thrugh this project.
+Claude by Anthropic was used to help write code and guide me through this project.
