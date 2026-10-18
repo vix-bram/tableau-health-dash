@@ -38,3 +38,10 @@ Source: `scripts/download_data.py`, then `scripts/explore_data.py`. Exact file v
 ### Other
 - `measure_name` values are codes, not names: READM-30-AMI / CABG / COPD / HF / HIP-KNEE / PN-HRRP. Map them to readable labels on Day 2.
 - General Information has 38 columns. We only need about 7.
+
+## Day 2: cleaning and MySQL (Oct 18)
+
+- `scripts/build_database.py` rebuilds everything in one command and all checks pass. The ratio always equals predicted / expected (max gap 0.00006), and every missing ratio is explained by footnote 1, 5 or 7.
+- **All six of the most extreme ratios are hip/knee replacement.** The lowest (0.47 to 0.56) are specialist orthopaedic and surgical hospitals, such as Kansas City Orthopaedic Institute and Salina Surgical Hospital. The highest (1.57 to 1.63) are general hospitals. That could be a finding about specialist hospitals. Check it on Day 3.
+- **Nationally, every condition is about 50/50.** 47 to 50% of hospitals are above 1.0, and the average ratio is about 1.00 for all six conditions. That follows from how CMS calibrates "expected", which centres the national picture on 1.0. So View 2 will look flat, and saying "condition X is the problem" isn't supported. The real variation is between states, ownership types and individual hospitals. Consider reworking View 2 to show the *spread* per condition (how far the worst hospitals sit above 1.0) rather than the share above 1.0.
+- MySQL: database `hospital_readmissions`, user `readmissions` (rights on this database only). Credentials are in `.env`, which is git-ignored.

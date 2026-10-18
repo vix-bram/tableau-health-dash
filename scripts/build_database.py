@@ -25,6 +25,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import URL
+from sqlalchemy.exc import OperationalError
 
 import clean_data
 
@@ -71,10 +72,15 @@ def main():
 
     print(f"\nStep 2: create database `{database}` and tables")
     server = create_engine(connection_url())
-    with server.begin() as conn:
-        conn.execute(text(f"CREATE DATABASE IF NOT EXISTS `{database}` "
-                          "CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci"))
-        version = conn.execute(text("SELECT VERSION()")).scalar()
+    try:
+        with server.begin() as conn:
+            conn.execute(text(f"CREATE DATABASE IF NOT EXISTS `{database}` "
+                              "CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci"))
+            version = conn.execute(text("SELECT VERSION()")).scalar()
+    except OperationalError as error:
+        print(f"  FAILED  could not connect to MySQL: {error.orig.args[-1]}")
+        print("  Check MYSQL_USER and MYSQL_PASSWORD in .env, and that the MySQL80 service is running.")
+        return 1
     print(f"  MySQL {version}")
     if int(version.split(".")[0]) < 8:
         print("  FAILED  MySQL 8.0 or later is needed for CTEs and RANK()")

@@ -2,3 +2,5 @@
 data/raw/
 7-day-plan.md
 data/clean/
+.env
+__pycache__/
