@@ -1,6 +1,6 @@
 # Notes
 
-## Day 1: first look at the data (Oct 2026)
+## Session 1: first look at the data
 
 Source: `scripts/download_data.py`, then `scripts/explore_data.py`. Exact file versions are in `data/raw/download_log.json`.
 
@@ -27,7 +27,7 @@ Source: `scripts/download_data.py`, then `scripts/explore_data.py`. Exact file v
 
 ### Surprises
 1. **Every hospital that matches is an Acute Care Hospital.** All 3,035 hospitals found in both files have `hospital_type = "Acute Care Hospitals"`. HRRP only covers acute care hospitals, so a hospital-type comparison (View 3) has nothing to compare. **Ownership (12 categories) still works.** View 3 should probably become ownership only, perhaps with emergency services as a second split.
-2. **"Minimum discharges" will silently drop rows.** 3,683 rows have a ratio but "N/A" discharges and "Too Few to Report" readmissions. These are small-volume hospitals. A minimum-discharges filter in Tableau will drop them all, not just the ones below the threshold. Decide on Day 2 how to treat them.
+2. **"Minimum discharges" will silently drop rows.** 3,683 rows have a ratio but "N/A" discharges and "Too Few to Report" readmissions. These are small-volume hospitals. A minimum-discharges filter in Tableau will drop them all, not just the ones below the threshold. Decide in Session 2 how to treat them.
 3. **The ratios sit very tightly around 1.0.** Mean 1.002, median 0.997, middle 50% between 0.958 and 1.042, range 0.47 to 1.63. About 48% of rows with a ratio are above 1.0. "Above 1.0" is close to a coin flip, so the dashboard should also show how far above.
 4. **Star ratings:** 381 of the 3,035 matched hospitals have no star rating. That matters for View 4.
 
@@ -36,22 +36,22 @@ Source: `scripts/download_data.py`, then `scripts/explore_data.py`. Exact file v
 - 3,055 HRRP hospitals, of which **3,035 match** General Information. **20 HRRP hospitals have no match.** 2,384 General Information hospitals aren't in HRRP (expected: psychiatric, critical access, children's and others).
 
 ### Other
-- `measure_name` values are codes, not names: READM-30-AMI / CABG / COPD / HF / HIP-KNEE / PN-HRRP. Map them to readable labels on Day 2.
+- `measure_name` values are codes, not names: READM-30-AMI / CABG / COPD / HF / HIP-KNEE / PN-HRRP. Map them to readable labels in Session 2.
 - General Information has 38 columns. We only need about 7.
 
-## Day 2: cleaning and MySQL (Oct 18)
+## Session 2: cleaning and MySQL (Oct 18)
 
 - `scripts/build_database.py` rebuilds everything in one command and all checks pass. The ratio always equals predicted / expected (max gap 0.00006), and every missing ratio is explained by footnote 1, 5 or 7.
-- **All six of the most extreme ratios are hip/knee replacement.** The lowest (0.47 to 0.56) are specialist orthopaedic and surgical hospitals, such as Kansas City Orthopaedic Institute and Salina Surgical Hospital. The highest (1.57 to 1.63) are general hospitals. That could be a finding about specialist hospitals. Check it on Day 3.
+- **All six of the most extreme ratios are hip/knee replacement.** The lowest (0.47 to 0.56) are specialist orthopaedic and surgical hospitals, such as Kansas City Orthopaedic Institute and Salina Surgical Hospital. The highest (1.57 to 1.63) are general hospitals. That could be a finding about specialist hospitals. Check it in Session 3.
 - **Nationally, every condition is about 50/50.** 47 to 50% of hospitals are above 1.0, and the average ratio is about 1.00 for all six conditions. That follows from how CMS calibrates "expected", which centres the national picture on 1.0. So View 2 will look flat, and saying "condition X is the problem" isn't supported. The real variation is between states, ownership types and individual hospitals. Consider reworking View 2 to show the *spread* per condition (how far the worst hospitals sit above 1.0) rather than the share above 1.0.
 - MySQL: database `hospital_readmissions`, user `readmissions` (rights on this database only). Credentials are in `.env`, which is git-ignored.
 
-## Day 3: SQL analysis and export (Oct 18)
+## Session 3: SQL analysis and export (Oct 18)
 
-Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates the view, runs `sql/01` to `05` and exports `data/tableau/hospital_condition.csv`. These are observations, not findings yet. Check them against the Tableau views on Day 4.
+Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates the view, runs `sql/01` to `05` and exports `data/tableau/hospital_condition.csv`. These are observations, not findings yet. Check them against the Tableau views in Session 4.
 
 ### Decisions
-- **Which rows count.** Every query uses hospitals that match General Information, the same rows as the Tableau view, so Day 4 can be reconciled exactly. The view has 18,210 rows from 3,035 hospitals. The 20 unmatched hospitals (120 rows) are left out because they have no name, state or ownership.
+- **Which rows count.** Every query uses hospitals that match General Information, the same rows as the Tableau view, so Session 4 can be reconciled exactly. The view has 18,210 rows from 3,035 hospitals. The 20 unmatched hospitals (120 rows) are left out because they have no name, state or ownership.
 - **Numbers on matched rows** (use these in the README): **11,681** rows have a ratio (11,720 in the whole file), **3,668** are volume-suppressed (3,683 in the whole file), and all 377 partial-period rows are matched.
 - **State cutoff: at least 10 hospitals with a ratio**, applied per condition. 238 of 306 state × condition cells are shown, covering about 97% of rows. Seven small states have fewer than 10 hospitals with a ratio even for all conditions together: DC, DE and VT (6 each), ND (7), AK and WY (8 each) and RI (9), so they will be blank on the map.
 - **Ranking cutoff: at least 100 discharges.** That is about 4× CMS's floor of 25, and every condition still has 250 or more eligible hospitals. A cutoff of 200 would have left bypass surgery with only 110. Volume-suppressed rows have NULL discharges, so they can never be ranked.
@@ -66,7 +66,7 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 5. **The hip/knee specialist pattern holds at 100 or more discharges.** At least 6 of the best 10 are orthopaedic or surgical specialty hospitals, and 4 are physician-owned, which probably explains finding 3. They are high-volume (578 to 2,393 discharges). The worst 10 are all general hospitals with only 101 to 292 discharges. Specialty and volume are mixed together, so don't claim a cause.
 6. **The suppressed small hospitals average below 1.0.** In most ownership groups the average over counted rows is higher than the simple average. Weighting then pulls it down again, so large hospitals look slightly better than mid-sized ones. The choice of average shifts the story a little.
 
-### To handle on Day 4
+### To handle in Session 4
 - View 2: chart the spread (for example share above 1.10 and below 0.90, or a box plot) rather than the share above 1.0.
 - View 1: footnote the seven blank states.
 - View 3: combine Federal and Tribal into "Other" or footnote them.
