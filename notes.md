@@ -72,3 +72,23 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - View 3: combine Federal and Tribal into "Other" or footnote them.
 - The best/worst lists include two partial-period ratios (Ascension St Vincent Evansville for hip/knee, Kootenai Health for pneumonia). Footnote them if they appear.
 - Don't open and save the CSV in Excel, because it drops the leading zeros from `facility_id`.
+
+## Session 4: Tableau views (Oct 19)
+
+### Setup
+- Connected to `data/tableau/hospital_condition.csv`. `facility_id` is a string (keeps leading zeros) and `state` has the State/Province role.
+- Converted to dimensions: Hospital Overall Rating, Emergency Services, Footnote, Has Ratio, Volume Suppressed, Partial Period, Rankable. `Above 1` stays a measure, so `AVG([Above 1])` is the share above 1.0 (Tableau skips the blank rows with no ratio). Default number format: percentage, 1 decimal.
+- Calculated field `Hospitals with ratio` = `COUNTD(IF NOT ISNULL([Excess Readmission Ratio]) THEN [Facility Id] END)`, the same count as `COUNT(DISTINCT facility_id)` in `sql/02`.
+
+### Reconcile (Tableau vs SQL)
+| Check | SQL / CSV | Tableau | Match |
+|---|---|---|---|
+| National share above 1.0 | 48.1% (11,681 rows) | 48.1% | Yes |
+| NJ, all conditions | 65.4%, 61 hospitals | 65.4%, 61 hospitals | Yes |
+| Proprietary share above 1.0 | 55.0% (2,093 rows) | to check in View 3 | |
+
+### View 1: State map
+- Filled map of `AVG([Above 1])` with a Condition Name dropdown (single value, "(All)" = all conditions pooled).
+- Filter `Hospitals with ratio` at least 10, matching the SQL cutoff. Under All conditions the seven small states (DC, DE, VT, ND, AK, WY, RI) are blank, as expected.
+- Colors: Orange-Blue diverging, reversed, centered at 50%. Orange = more than half of results above 1.0. Range 18.9% (MT) to 65.4% (NJ).
+- Caption explains the measure and the blank states.
