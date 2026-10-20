@@ -138,3 +138,43 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Mount Sinai (a very large hospital) has suppressed discharges for hip/knee (ratio 0.577) and CABG. CMS hides the counts when a hospital has **fewer than 11 readmissions** for a condition, not only when the hospital is small. So suppression is partly triggered by having few readmissions, which goes with a low ratio. This is a selection effect and helps explain why suppressed rows average below 1.0 and why shares jump when View 3's minimum-discharges slider moves off 0.
 - Fix the wording "small hospitals" in the View 3 caption and in the README (Session 6): say "results where CMS hid the counts (fewer than 11 readmissions)".
 - Hospital lookup tooltip: show "Not published (fewer than 11 readmissions)" instead of a blank discharges value.
+
+### View 5 fixes
+- Rows with no ratio now say why: `Condition label` = `[Condition Name] + IF ISNULL([Excess Readmission Ratio]) THEN " – " + [Footnote Text] ELSE "" END` replaces Condition Name on Rows. Every no-ratio row has a footnote: "Results not available for this period" (3,218), "Too few cases to report" (3,109), "No cases met the criteria" (202). The "1 null" indicator is hidden.
+- Colors assigned explicitly (False = blue, True = orange, Null = grey). With default colors, a hospital with a missing condition added a Null value and the palette shifted (red/orange instead of orange/blue).
+- Also checked: Northside Hospital (Atlanta, GA) and Emory Decatur Hospital (Decatur, GA) match the CSV.
+
+### Dashboards
+- Both 1200 × 900 (fixed size).
+- **National picture:** 2×2 grid (State Map, Spread by Condition / Ownership, Star Rating) with a narrow right column for the Condition filter, the Minimum discharges slider and two legends. The Condition filter applies to State Map, Ownership and Star Rating, but **not** Spread by Condition (it compares conditions, so filtering it would leave one row). All views set to Fit → Entire View.
+  - Checked with Heart failure selected: star ratings 79.0% (n = 167) to 26.4% (n = 280), Proprietary 58.6%, Physician 30.8%.
+  - The map zooms out to fit Hawaii, which shows a lot of ocean. Fix: State Map → Map → Background Maps → None.
+  - If a chart gets zoomed by accident (trackpad pinch), right-click the axis → Clear Axis Range. Use Presentation Mode (F7) to see the dashboard as viewers will.
+- **Find a hospital:** Hospital dropdown across the top, Hospital Lookup below, "Worse than expected" legend removed (the subtitle explains the colors).
+- Worksheet captions don't carry over to dashboards. Plan: the short explanation goes in each view's subtitle, and the method details go in one Notes text box per dashboard.
+
+### Polish to-do (Session 5, not done yet)
+Part 1, worksheet titles (first line bold 14, second line regular 10 grey):
+
+| Sheet | Title | Subtitle |
+|---|---|---|
+| State Map | Readmissions run above expected most often in the Northeast and South | Share of hospital results with more readmissions than expected (ratio above 1.0). Orange = more than half. |
+| Spread by Condition | Hip/knee results vary most between hospitals, COPD results least | Share of hospitals more than 10% better (blue) or worse (orange) than expected |
+| Ownership | For-profit hospitals most often exceed expected readmissions; physician-owned least often | Share of results above 1.0 by ownership. Line = 50%. n = hospitals. |
+| Star Rating | Higher-rated hospitals exceed expected readmissions far less often | Share of results above 1.0 by CMS overall star rating. n = hospitals. |
+| Hospital Lookup | `<Hospital>: readmissions compared with expected` (Insert → Hospital) | Bars: this hospital, % more (orange) or fewer (blue) readmissions than expected. Black tick: average hospital in the same state. |
+
+Part 1, other fixes:
+- [ ] Ownership labels: add Hospitals with ratio to Label, text `<AVG(Above 1)>  (n = <AGG(Hospitals with ratio)>)`. Needed because with a single condition selected, "Other (Federal, Tribal)" can top the chart with only 14 hospitals.
+- [ ] Hide Field Labels for Rows (Spread by Condition, Ownership, Hospital Lookup) and for Columns (Star Rating).
+- [ ] Star Rating: rotate the "1 star ... 5 stars" headers to horizontal.
+- [ ] Axis titles: Ownership "Share of results above 1.0"; Hospital Lookup "% more (+) or fewer (−) readmissions than expected"; Spread by Condition "Share of hospitals".
+- [ ] National picture legends: "Avg. Above 1" → "Share of results above 1.0"; hide the "Measure Names" title.
+- [ ] Widen the ownership name column so "Voluntary non-profit - ..." isn't cut off.
+- [ ] Delete the test worksheet "Sheet 1" (if still there).
+
+Part 2 (instructions still to come):
+- [ ] Dashboard header text on each dashboard: title, one plain-language line on what the ratio means, and the source (CMS Hospital Readmissions Reduction Program, discharges July 2021 to June 2024).
+- [ ] Notes text box on each dashboard with the method details from the worksheet captions: the 10-hospital cutoff (map, ownership), 197 unrated hospitals left out, the star rating includes a readmission measure, the minimum-discharges slider. Use the corrected wording for suppressed rows: "results where CMS hid the counts (fewer than 11 readmissions)", not "small hospitals".
+- [ ] Tooltips in plain language, showing discharges. Hospital Lookup: show "Not published (fewer than 11 readmissions)" instead of a blank discharges value.
+- [ ] Final check in Presentation Mode, then the "done when" test: find any hospital in under a minute.
