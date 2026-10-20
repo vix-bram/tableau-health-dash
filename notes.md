@@ -85,7 +85,8 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 |---|---|---|---|
 | National share above 1.0 | 48.1% (11,681 rows) | 48.1% | Yes |
 | NJ, all conditions | 65.4%, 61 hospitals | 65.4%, 61 hospitals | Yes |
-| Proprietary share above 1.0 | 55.0% (2,093 rows) | to check in View 3 | |
+| Proprietary share above 1.0 | 54.9% (2,093 rows, 544 hospitals) | 54.9% | Yes |
+| Proprietary, minimum 25 discharges | 63.4% | 63.4% | Yes |
 
 ### View 1: State map
 - Filled map of `AVG([Above 1])` with a Condition Name dropdown (single value, "(All)" = all conditions pooled).
@@ -101,3 +102,15 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Both on one axis via Measure Values, Measure Names on Color (blue = better, orange = worse), sorted by Much worse descending.
 - Matches the CSV: hip/knee 25.0% better / 23.1% worse, CABG 14.4 / 13.2, pneumonia 4.8 / 7.5, heart failure 5.4 / 6.7, heart attack 5.5 / 6.5, COPD 0.9 / 2.9.
 - Small bars (COPD, pneumonia "better") are too narrow for labels; the tooltip shows the value.
+
+### View 3: Ownership
+- Bars of `AVG([Above 1])` by `Ownership group`, sorted descending, same diverging colors as the map (center 50%), reference line at 50% (parameter `Reference line 50%`, control hidden).
+- `Ownership group` = Hospital Ownership with Government - Federal and Tribal combined as "Other (Federal, Tribal)".
+- Minimum-discharges slider: parameter `Minimum discharges` (0 to 500, step 25) and filter `Meets minimum discharges` = `[Minimum discharges] = 0 OR [Number Of Discharges] >= [Minimum discharges]`. At 0 every hospital counts. Any higher value also drops the 3,668 volume-suppressed rows (blank discharges; the smallest published value is 27), so the shares jump: Proprietary 54.9% at 0, 63.4% at 25, 59.0% at 100. The order barely changes (for-profit and local government highest, physician-owned lowest).
+- Filter `Hospitals with ratio` at least 10, the same rule as the map. It only affects "Other": 18 hospitals at 0, but 7 at 25 (Tribal has no published discharges), where it otherwise jumped to the top at 73.7%.
+- Caption explains the slider, the grouping and the 10-hospital rule.
+
+### Left for Session 5 polish
+- Axis and legend titles: replace "Avg. Above 1" with "Share of results above 1.0".
+- Widen the ownership name column so "Voluntary non-profit - ..." isn't cut off.
+- Delete the test worksheet "Sheet 1".
