@@ -114,3 +114,13 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Axis and legend titles: replace "Avg. Above 1" with "Share of results above 1.0".
 - Widen the ownership name column so "Voluntary non-profit - ..." isn't cut off.
 - Delete the test worksheet "Sheet 1".
+- Star rating: rotate the "1 star ... 5 stars" headers to horizontal and hide the "Hospital Overall Rating" field label.
+
+## Session 5: finish and assemble (Oct 20)
+
+### View 4: Star rating
+- Charted the **share above 1.0** rather than the average ratio (the plan's wording), so it matches Views 1 and 3. Averages of 0.97 to 1.05 look almost the same as bars; the shares show the step pattern clearly. The average ratio is in the tooltip.
+- Bars of `AVG([Above 1])` by Hospital Overall Rating (discrete dimension), Null excluded, aliases "1 star" to "5 stars". Labels show the share and `n = <Hospitals with ratio>`. Same diverging colors (center 50%) and 50% reference line as View 3.
+- Default number format for Excess Readmission Ratio set to 3 decimals.
+- Matches the CSV: 1 star 72.5% (n = 169, avg 1.048), 2 stars 61.1% (567, 1.025), 3 stars 49.9% (840, 1.006), 4 stars 38.8% (758, 0.986), 5 stars 30.7% (287, 0.966). 197 hospitals with a ratio have no rating and are left out (caption says so).
+- Caption notes that the star rating includes a readmission measure, so part of the link is built in.
