@@ -92,3 +92,12 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Filter `Hospitals with ratio` at least 10, matching the SQL cutoff. Under All conditions the seven small states (DC, DE, VT, ND, AK, WY, RI) are blank, as expected.
 - Colors: Orange-Blue diverging, reversed, centered at 50%. Orange = more than half of results above 1.0. Range 18.9% (MT) to 65.4% (NJ).
 - Caption explains the measure and the blank states.
+
+### View 2: Spread by condition
+- Changed from the plan (share above 1.0 by condition) because Session 3 showed every condition sits at 47 to 50% above 1.0. The chart shows the spread instead.
+- Diverging bars per condition. Calculated fields (default aggregation Average, number format `0.0%;0.0%`):
+  - `Much worse (>1.10)` = `IF NOT ISNULL([Excess Readmission Ratio]) THEN IIF([Excess Readmission Ratio] > 1.1, 1, 0) END`
+  - `Much better (<0.90)` = `IF NOT ISNULL([Excess Readmission Ratio]) THEN IIF([Excess Readmission Ratio] < 0.9, -1, 0) END` (negative so the bar points left)
+- Both on one axis via Measure Values, Measure Names on Color (blue = better, orange = worse), sorted by Much worse descending.
+- Matches the CSV: hip/knee 25.0% better / 23.1% worse, CABG 14.4 / 13.2, pneumonia 4.8 / 7.5, heart failure 5.4 / 6.7, heart attack 5.5 / 6.5, COPD 0.9 / 2.9.
+- Small bars (COPD, pneumonia "better") are too narrow for labels; the tooltip shows the value.
