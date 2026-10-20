@@ -124,3 +124,17 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Default number format for Excess Readmission Ratio set to 3 decimals.
 - Matches the CSV: 1 star 72.5% (n = 169, avg 1.048), 2 stars 61.1% (567, 1.025), 3 stars 49.9% (840, 1.006), 4 stars 38.8% (758, 0.986), 5 stars 30.7% (287, 0.966). 197 hospitals with a ratio have no rating and are left out (caption says so).
 - Caption notes that the star rating includes a readmission measure, so part of the link is built in.
+
+### View 5: Hospital lookup
+- 97 hospital names appear more than once, so the dropdown uses `Hospital` = `[Facility Name] + " (" + [City Town] + ", " + [State] + ")"`, which is unique for all 3,035 hospitals. Filter on Hospital, single value dropdown.
+- Shows each ratio as "% more or fewer readmissions than expected" instead of the raw ratio (easier to read; the 1.0 line becomes the zero line):
+  - `Readmissions vs expected` = `AVG([Excess Readmission Ratio]) - 1`
+  - `State vs expected` = `AVG({FIXED [State], [Condition Name]: AVG([Excess Readmission Ratio])}) - 1`. FIXED computes before the hospital filter, so it is the state average across hospitals (each hospital counts equally). No 10-hospital cutoff here, so small states average only a few hospitals.
+  - `Worse than expected` = `[Readmissions vs expected] > 0` on Color (orange True, blue False). Number format `+0.0%;-0.0%;0.0%`.
+- State average drawn as a black reference line per cell (no label); value in the tooltip.
+- Checked against the CSV: Southeast Health Medical Center (Dothan, AL) and Mount Sinai Hospital (New York, NY) match on all six conditions.
+
+### Correction: what "volume suppressed" means
+- Mount Sinai (a very large hospital) has suppressed discharges for hip/knee (ratio 0.577) and CABG. CMS hides the counts when a hospital has **fewer than 11 readmissions** for a condition, not only when the hospital is small. So suppression is partly triggered by having few readmissions, which goes with a low ratio. This is a selection effect and helps explain why suppressed rows average below 1.0 and why shares jump when View 3's minimum-discharges slider moves off 0.
+- Fix the wording "small hospitals" in the View 3 caption and in the README (Session 6): say "results where CMS hid the counts (fewer than 11 readmissions)".
+- Hospital lookup tooltip: show "Not published (fewer than 11 readmissions)" instead of a blank discharges value.
