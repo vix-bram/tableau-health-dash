@@ -77,6 +77,30 @@ There is deliberately no foreign key from `readmissions` to `hospitals`, so the 
 | `sql/05_best_worst_hospitals.sql` | Best and worst 10 hospitals per condition (100+ discharges) | CTE, `RANK() OVER (PARTITION BY …)` |
 | `sql/06_v_hospital_condition.sql` | Flat view exported for Tableau | View |
 
+## The dashboard
+
+**National picture** (one condition filter for the page):
+
+1. **State map:** share of results above 1.0 by state.
+2. **Spread by condition:** share of hospitals more than 10% better or worse than expected for each condition. This replaced the planned "share above 1.0 by condition", because every condition sits at 47 to 50%.
+3. **Ownership:** share above 1.0 by ownership group, with a minimum-discharges slider.
+4. **Star rating:** share above 1.0 by CMS overall star rating, with the hospital count on each bar.
+
+**Find a hospital:** pick any hospital to see, for each condition, how many more or fewer readmissions it had than expected, next to the average hospital in its state. Where there's no result, the row gives CMS's reason.
+
+![Find a hospital dashboard](images/Find-a-Hospital.png)
+
+## Limitations
+
+- **One snapshot, not a trend.** The data covers a single three-year window (July 2021 to June 2024), so it can't show whether hospitals are improving.
+- **Medicare patients only.** The measures describe Medicare fee-for-service patients, not everyone a hospital treats.
+- **Missing results.** 6,529 of the 18,210 hospital-condition rows used have no ratio. CMS gives the reason in a footnote: too few cases, results not available for the period, or no cases met the criteria. These rows are left out of every share and average.
+- **Hidden counts.** 3,668 results have a ratio but no published discharges or readmissions, because CMS hides the counts when a hospital has fewer than 11 readmissions for a condition. This isn't only small hospitals: it is tied to having few readmissions, so these results tend to have low ratios. Any minimum-discharges filter drops them all, which is why the Ownership chart's shares rise when the slider moves off 0.
+- **Small groups are noisy.** States and ownership groups with fewer than 10 hospitals reporting a ratio are hidden, and hospitals are only ranked with at least 100 discharges. On the hospital lookup, the state average for small states rests on only a few hospitals.
+- **Unrated hospitals.** 197 hospitals with a ratio have no CMS star rating and are left out of the star rating chart.
+- **Partial-period data.** 377 ratios were calculated from partial-period data under a CMS-approved exception (footnote 29). They are kept and flagged. Two of them appear in the best/worst lists: Ascension St Vincent Evansville (hip/knee) and Kootenai Health (pneumonia).
+- **Associations, not causes.** For example, a higher share above 1.0 for for-profit hospitals doesn't show that ownership causes it. Patient mix, volume and specialty all differ between groups.
+
 ## How to run it
 
 You need Python 3.11 and MySQL 8.0 or later.
@@ -107,30 +131,6 @@ python scripts/run_analysis.py     # run the SQL and export data/tableau/hospita
 ```
 
 Each script stops with an error if one of its checks fails. CMS refreshes these datasets, so a new download may give slightly different numbers from the ones above.
-
-## The dashboard
-
-**National picture** (one condition filter for the page):
-
-1. **State map:** share of results above 1.0 by state.
-2. **Spread by condition:** share of hospitals more than 10% better or worse than expected for each condition. This replaced the planned "share above 1.0 by condition", because every condition sits at 47 to 50%.
-3. **Ownership:** share above 1.0 by ownership group, with a minimum-discharges slider.
-4. **Star rating:** share above 1.0 by CMS overall star rating, with the hospital count on each bar.
-
-**Find a hospital:** pick any hospital to see, for each condition, how many more or fewer readmissions it had than expected, next to the average hospital in its state. Where there's no result, the row gives CMS's reason.
-
-![Find a hospital dashboard](images/Find-a-Hospital.png)
-
-## Limitations
-
-- **One snapshot, not a trend.** The data covers a single three-year window (July 2021 to June 2024), so it can't show whether hospitals are improving.
-- **Medicare patients only.** The measures describe Medicare fee-for-service patients, not everyone a hospital treats.
-- **Missing results.** 6,529 of the 18,210 hospital-condition rows used have no ratio. CMS gives the reason in a footnote: too few cases, results not available for the period, or no cases met the criteria. These rows are left out of every share and average.
-- **Hidden counts.** 3,668 results have a ratio but no published discharges or readmissions, because CMS hides the counts when a hospital has fewer than 11 readmissions for a condition. This isn't only small hospitals: it is tied to having few readmissions, so these results tend to have low ratios. Any minimum-discharges filter drops them all, which is why the Ownership chart's shares rise when the slider moves off 0.
-- **Small groups are noisy.** States and ownership groups with fewer than 10 hospitals reporting a ratio are hidden, and hospitals are only ranked with at least 100 discharges. On the hospital lookup, the state average for small states rests on only a few hospitals.
-- **Unrated hospitals.** 197 hospitals with a ratio have no CMS star rating and are left out of the star rating chart.
-- **Partial-period data.** 377 ratios were calculated from partial-period data under a CMS-approved exception (footnote 29). They are kept and flagged. Two of them appear in the best/worst lists: Ascension St Vincent Evansville (hip/knee) and Kootenai Health (pneumonia).
-- **Associations, not causes.** For example, a higher share above 1.0 for for-profit hospitals doesn't show that ownership causes it. Patient mix, volume and specialty all differ between groups.
 
 ## Repository layout
 
