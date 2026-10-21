@@ -45,7 +45,7 @@ CREATE TABLE readmissions (
     footnote                   TINYINT,             -- CMS footnote code
     footnote_text              VARCHAR(100),
     has_ratio                  BOOLEAN       NOT NULL,  -- FALSE: no ratio (footnote 1, 5 or 7)
-    volume_suppressed          BOOLEAN       NOT NULL,  -- ratio present, counts hidden (small volume)
+    volume_suppressed          BOOLEAN       NOT NULL,  -- ratio present, counts hidden (fewer than 11 readmissions)
     partial_period             BOOLEAN       NOT NULL,  -- footnote 29: partial-period data
     start_date                 DATE          NOT NULL,
     end_date                   DATE          NOT NULL,

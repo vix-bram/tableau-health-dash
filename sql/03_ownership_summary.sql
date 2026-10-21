@@ -10,7 +10,7 @@
 --                       published (volume_suppressed rows have NULL discharges)
 --   weighted_avg_ratio  discharge-weighted average over those same results
 -- Comparing avg_ratio with avg_ratio_counted shows the effect of dropping the
--- small, suppressed hospitals; comparing avg_ratio_counted with
+-- results where CMS hid the counts (fewer than 11 readmissions); comparing avg_ratio_counted with
 -- weighted_avg_ratio shows the effect of weighting by volume.
 
 SELECT
