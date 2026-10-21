@@ -1,5 +1,6 @@
 .venv/
-data/raw/
+data/raw/*
+!data/raw/download_log.json
 7-day-plan.md
 data/clean/
 .env
