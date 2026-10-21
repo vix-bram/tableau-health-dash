@@ -2,9 +2,9 @@
 
 Which hospitals, states and ownership types readmit Medicare patients more often than expected, for which conditions, and do higher-rated hospitals readmit fewer patients?
 
-**[View the interactive dashboard on Tableau Public](TABLEAU_PUBLIC_LINK)**
+**[View the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/vikram.kaushik3019/viz/HospitalReadmissions_17924318810080/NationalPicture)**
 
-![National picture dashboard](images/national-picture.png)
+![National picture dashboard](images/National-Picture.png)
 
 This project takes two public CMS datasets through a Python cleaning step, a MySQL database and SQL analysis, and ends in a two-page Tableau Public dashboard: a national overview and a lookup for any of 3,035 hospitals.
 
@@ -119,7 +119,7 @@ Each script stops with an error if one of its checks fails. CMS refreshes these 
 
 **Find a hospital:** pick any hospital to see, for each condition, how many more or fewer readmissions it had than expected, next to the average hospital in its state. Where there's no result, the row gives CMS's reason.
 
-![Find a hospital dashboard](images/find-a-hospital.png)
+![Find a hospital dashboard](images/Find-a-Hospital.png)
 
 ## Limitations
 
