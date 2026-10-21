@@ -153,8 +153,8 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - **Find a hospital:** Hospital dropdown across the top, Hospital Lookup below, "Worse than expected" legend removed (the subtitle explains the colors).
 - Worksheet captions don't carry over to dashboards. Plan: the short explanation goes in each view's subtitle, and the method details go in one Notes text box per dashboard.
 
-### Polish to-do (Session 5, not done yet)
-Part 1, worksheet titles (first line bold 14, second line regular 10 grey):
+### Polish to-do (Session 5, part 1 done Oct 20)
+Part 1, worksheet titles (first line bold 14, second line regular 10 grey). Done:
 
 | Sheet | Title | Subtitle |
 |---|---|---|
@@ -165,13 +165,19 @@ Part 1, worksheet titles (first line bold 14, second line regular 10 grey):
 | Hospital Lookup | `<Hospital>: readmissions compared with expected` (Insert → Hospital) | Bars: this hospital, % more (orange) or fewer (blue) readmissions than expected. Black tick: average hospital in the same state. |
 
 Part 1, other fixes:
-- [ ] Ownership labels: add Hospitals with ratio to Label, text `<AVG(Above 1)>  (n = <AGG(Hospitals with ratio)>)`. Needed because with a single condition selected, "Other (Federal, Tribal)" can top the chart with only 14 hospitals.
-- [ ] Hide Field Labels for Rows (Spread by Condition, Ownership, Hospital Lookup) and for Columns (Star Rating).
-- [ ] Star Rating: rotate the "1 star ... 5 stars" headers to horizontal.
-- [ ] Axis titles: Ownership "Share of results above 1.0"; Hospital Lookup "% more (+) or fewer (−) readmissions than expected"; Spread by Condition "Share of hospitals".
-- [ ] National picture legends: "Avg. Above 1" → "Share of results above 1.0"; hide the "Measure Names" title.
-- [ ] Widen the ownership name column so "Voluntary non-profit - ..." isn't cut off.
-- [ ] Delete the test worksheet "Sheet 1" (if still there).
+- [x] Ownership labels: added Hospitals with ratio to Label, showing `(n = <AGG(Hospitals with ratio)>)` only. Needed because with a single condition selected, "Other (Federal, Tribal)" can top the chart with only 14 hospitals. The share was left out of the label: on two lines the labels were taller than the bars and Tableau hid some, and the axis already shows the share.
+- [x] Field labels: kept on purpose (Condition Name, Ownership group, Condition Label). Only Star Rating's "Hospital Overall Rating" label was hidden.
+- [x] Star Rating: headers rotated to horizontal.
+- [x] Axis titles: Ownership "Share of results above 1.0"; Hospital Lookup "% more (+) or fewer (-) readmissions than expected"; Spread by Condition "Share of hospitals".
+- [x] National picture legends: color legends retitled "Share of results above 1.0". The "Measure Names" title was kept on purpose.
+- [x] Widened the ownership name column (all names show in full, including "Government - Hospital District or Authority").
+- [x] Test worksheet "Sheet 1" deleted.
+- [x] Ownership caption: "small hospitals whose volume CMS suppresses" replaced with "results where CMS hid the counts (fewer than 11 readmissions)".
+- Kept the State Map background map (the map looked odd without it).
+- Hospital Lookup "Worse than expected" legend can't be aliased (it is an aggregate calculation, so Tableau offers no Edit Alias). Left as is because the legend isn't on the Find a Hospital dashboard.
+- Checked Star Rating with Heart failure selected against the CSV: 79.0% (n = 167), 62.8% (559), 51.6% (830), 37.0% (746), 26.4% (280). All match.
+- Both dashboards checked after the titles were added: every view fits, with titles on two lines. The dashboard scrolls on this laptop only because the window is shorter than 900 px.
+- Before the final save: set the Condition filter to (All) and leave National picture open. The titles describe all conditions combined, and some don't hold for a single condition (with Heart failure, "Other" and "Government - Local" sit above Proprietary).
 
 Part 2 (instructions still to come):
 - [ ] Dashboard header text on each dashboard: title, one plain-language line on what the ratio means, and the source (CMS Hospital Readmissions Reduction Program, discharges July 2021 to June 2024).
