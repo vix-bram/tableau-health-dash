@@ -66,12 +66,7 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 5. **The hip/knee specialist pattern holds at 100 or more discharges.** At least 6 of the best 10 are orthopaedic or surgical specialty hospitals, and 4 are physician-owned, which probably explains finding 3. They are high-volume (578 to 2,393 discharges). The worst 10 are all general hospitals with only 101 to 292 discharges. Specialty and volume are mixed together, so don't claim a cause.
 6. **The suppressed small hospitals average below 1.0.** In most ownership groups the average over counted rows is higher than the simple average. Weighting then pulls it down again, so large hospitals look slightly better than mid-sized ones. The choice of average shifts the story a little.
 
-### To handle in Session 4
-- View 2: chart the spread (for example share above 1.10 and below 0.90, or a box plot) rather than the share above 1.0.
-- View 1: footnote the seven blank states.
-- View 3: combine Federal and Tribal into "Other" or footnote them.
-- The best/worst lists include two partial-period ratios (Ascension St Vincent Evansville for hip/knee, Kootenai Health for pneumonia). Footnote them if they appear.
-- Don't open and save the CSV in Excel, because it drops the leading zeros from `facility_id`.
+- The best/worst lists include two partial-period ratios (Ascension St Vincent Evansville for hip/knee, Kootenai Health for pneumonia).
 
 ## Session 4: Tableau views (Oct 19)
 
@@ -79,6 +74,7 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Connected to `data/tableau/hospital_condition.csv`. `facility_id` is a string (keeps leading zeros) and `state` has the State/Province role.
 - Converted to dimensions: Hospital Overall Rating, Emergency Services, Footnote, Has Ratio, Volume Suppressed, Partial Period, Rankable. `Above 1` stays a measure, so `AVG([Above 1])` is the share above 1.0 (Tableau skips the blank rows with no ratio). Default number format: percentage, 1 decimal.
 - Calculated field `Hospitals with ratio` = `COUNTD(IF NOT ISNULL([Excess Readmission Ratio]) THEN [Facility Id] END)`, the same count as `COUNT(DISTINCT facility_id)` in `sql/02`.
+- Don't open and save the CSV in Excel, because it drops the leading zeros from `facility_id`.
 
 ### Reconcile (Tableau vs SQL)
 | Check | SQL / CSV | Tableau | Match |
@@ -109,12 +105,6 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Minimum-discharges slider: parameter `Minimum discharges` (0 to 500, step 25) and filter `Meets minimum discharges` = `[Minimum discharges] = 0 OR [Number Of Discharges] >= [Minimum discharges]`. At 0 every hospital counts. Any higher value also drops the 3,668 volume-suppressed rows (blank discharges; the smallest published value is 27), so the shares jump: Proprietary 54.9% at 0, 63.4% at 25, 59.0% at 100. The order barely changes (for-profit and local government highest, physician-owned lowest).
 - Filter `Hospitals with ratio` at least 10, the same rule as the map. It only affects "Other": 18 hospitals at 0, but 7 at 25 (Tribal has no published discharges), where it otherwise jumped to the top at 73.7%.
 - Caption explains the slider, the grouping and the 10-hospital rule.
-
-### Left for Session 5 polish
-- Axis and legend titles: replace "Avg. Above 1" with "Share of results above 1.0".
-- Widen the ownership name column so "Voluntary non-profit - ..." isn't cut off.
-- Delete the test worksheet "Sheet 1".
-- Star rating: rotate the "1 star ... 5 stars" headers to horizontal and hide the "Hospital Overall Rating" field label.
 
 ## Session 5: finish and assemble (Oct 20)
 
@@ -148,13 +138,13 @@ Source: `python scripts/run_analysis.py` (after `build_database.py`). It creates
 - Both 1200 × 900 (fixed size).
 - **National picture:** 2×2 grid (State Map, Spread by Condition / Ownership, Star Rating) with a narrow right column for the Condition filter, the Minimum discharges slider and two legends. The Condition filter applies to State Map, Ownership and Star Rating, but **not** Spread by Condition (it compares conditions, so filtering it would leave one row). All views set to Fit → Entire View.
   - Checked with Heart failure selected: star ratings 79.0% (n = 167) to 26.4% (n = 280), Proprietary 58.6%, Physician 30.8%.
-  - The map zooms out to fit Hawaii, which shows a lot of ocean. Fix: State Map → Map → Background Maps → None.
+  - The map zooms out to fit Hawaii, which shows a lot of ocean. Background Maps → None was tried but looked odd, so the background map stays.
   - If a chart gets zoomed by accident (trackpad pinch), right-click the axis → Clear Axis Range. Use Presentation Mode (F7) to see the dashboard as viewers will.
 - **Find a hospital:** Hospital dropdown across the top, Hospital Lookup below, "Worse than expected" legend removed (the subtitle explains the colors).
 - Worksheet captions don't carry over to dashboards. Plan: the short explanation goes in each view's subtitle, and the method details go in one Notes text box per dashboard.
 
-### Polish to-do (Session 5, part 1 done Oct 20)
-Part 1, worksheet titles (first line bold 14, second line regular 10 grey). Done:
+### Polish (Oct 20)
+Worksheet titles (first line bold 14, second line regular 10 grey). They describe all conditions combined, and some don't hold for a single condition (with Heart failure, "Other" and "Government - Local" sit above Proprietary).
 
 | Sheet | Title | Subtitle |
 |---|---|---|
@@ -164,23 +154,9 @@ Part 1, worksheet titles (first line bold 14, second line regular 10 grey). Done
 | Star Rating | Higher-rated hospitals exceed expected readmissions far less often | Share of results above 1.0 by CMS overall star rating. n = hospitals. |
 | Hospital Lookup | `<Hospital>: readmissions compared with expected` (Insert → Hospital) | Bars: this hospital, % more (orange) or fewer (blue) readmissions than expected. Black tick: average hospital in the same state. |
 
-Part 1, other fixes:
-- [x] Ownership labels: added Hospitals with ratio to Label, showing `(n = <AGG(Hospitals with ratio)>)` only. Needed because with a single condition selected, "Other (Federal, Tribal)" can top the chart with only 14 hospitals. The share was left out of the label: on two lines the labels were taller than the bars and Tableau hid some, and the axis already shows the share.
-- [x] Field labels: kept on purpose (Condition Name, Ownership group, Condition Label). Only Star Rating's "Hospital Overall Rating" label was hidden.
-- [x] Star Rating: headers rotated to horizontal.
-- [x] Axis titles: Ownership "Share of results above 1.0"; Hospital Lookup "% more (+) or fewer (-) readmissions than expected"; Spread by Condition "Share of hospitals".
-- [x] National picture legends: color legends retitled "Share of results above 1.0". The "Measure Names" title was kept on purpose.
-- [x] Widened the ownership name column (all names show in full, including "Government - Hospital District or Authority").
-- [x] Test worksheet "Sheet 1" deleted.
-- [x] Ownership caption: "small hospitals whose volume CMS suppresses" replaced with "results where CMS hid the counts (fewer than 11 readmissions)".
-- Kept the State Map background map (the map looked odd without it).
-- Hospital Lookup "Worse than expected" legend can't be aliased (it is an aggregate calculation, so Tableau offers no Edit Alias). Left as is because the legend isn't on the Find a Hospital dashboard.
+- Ownership labels show only `(n = <AGG(Hospitals with ratio)>)`. The n is needed because with a single condition selected, "Other (Federal, Tribal)" can top the chart with only 14 hospitals. The share was left out: on two lines the labels were taller than the bars and Tableau hid some, and the axis already shows the share.
+- Field labels kept on purpose (Condition Name, Ownership group, Condition Label), and the "Measure Names" legend title too. Only Star Rating's "Hospital Overall Rating" label was hidden.
+- Ownership caption now says "results where CMS hid the counts (fewer than 11 readmissions)" instead of "small hospitals".
+- The Hospital Lookup "Worse than expected" legend can't be aliased (it is an aggregate calculation, so Tableau offers no Edit Alias). Left as is because the legend isn't on the Find a Hospital dashboard.
 - Checked Star Rating with Heart failure selected against the CSV: 79.0% (n = 167), 62.8% (559), 51.6% (830), 37.0% (746), 26.4% (280). All match.
-- Both dashboards checked after the titles were added: every view fits, with titles on two lines. The dashboard scrolls on this laptop only because the window is shorter than 900 px.
-- Before the final save: set the Condition filter to (All) and leave National picture open. The titles describe all conditions combined, and some don't hold for a single condition (with Heart failure, "Other" and "Government - Local" sit above Proprietary).
-
-Part 2 (instructions still to come):
-- [ ] Dashboard header text on each dashboard: title, one plain-language line on what the ratio means, and the source (CMS Hospital Readmissions Reduction Program, discharges July 2021 to June 2024).
-- [ ] Notes text box on each dashboard with the method details from the worksheet captions: the 10-hospital cutoff (map, ownership), 197 unrated hospitals left out, the star rating includes a readmission measure, the minimum-discharges slider. Use the corrected wording for suppressed rows: "results where CMS hid the counts (fewer than 11 readmissions)", not "small hospitals".
-- [ ] Tooltips in plain language, showing discharges. Hospital Lookup: show "Not published (fewer than 11 readmissions)" instead of a blank discharges value.
-- [ ] Final check in Presentation Mode, then the "done when" test: find any hospital in under a minute.
+- Both dashboards fit with the new titles (on two lines). On this laptop they scroll only because the window is shorter than 900 px.
