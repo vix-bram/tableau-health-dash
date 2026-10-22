@@ -6,7 +6,7 @@ Which hospitals, states and ownership types readmit Medicare patients more often
 
 ![National picture dashboard](images/National-Picture.png)
 
-This project takes two public CMS datasets through a Python cleaning step, a MySQL database and SQL analysis, and ends in a two-page Tableau Public dashboard: a national overview and a lookup for any of 3,035 hospitals.
+This project takes two public CMS (Centers for Medicare & Medicaid Services - Federal Agency) datasets through a Python cleaning step, a MySQL database and SQL analysis, and ends in a two-page Tableau Public dashboard: a national overview and a lookup for any of 3,035 hospitals.
 
 ## Key findings
 
