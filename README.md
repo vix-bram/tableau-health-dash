@@ -97,7 +97,7 @@ There is deliberately no foreign key from `readmissions` to `hospitals`, so the 
 - **Missing results.** 6,529 of the 18,210 hospital-condition rows used have no ratio. CMS gives the reason in a footnote: too few cases, results not available for the period, or no cases met the criteria. These rows are left out of every share and average.
 - **Hidden counts.** 3,668 results have a ratio but no published discharges or readmissions, because CMS hides the counts when a hospital has fewer than 11 readmissions for a condition. This isn't only small hospitals: it is tied to having few readmissions, so these results tend to have low ratios. Any minimum-discharges filter drops them all, which is why the Ownership chart's shares rise when the slider moves off 0.
 - **Small groups are noisy.** States and ownership groups with fewer than 10 hospitals reporting a ratio are hidden, and hospitals are only ranked with at least 100 discharges. On the hospital lookup, the state average for small states rests on only a few hospitals.
-- **Unrated hospitals.** 197 hospitals with a ratio have no CMS star rating and are left out of the star rating chart.
+- **Unrated hospitals.** 197 hospitals with a readmissions ratio have no CMS star rating and are left out of the star rating chart.
 - **Partial-period data.** 377 ratios were calculated from partial-period data under a CMS-approved exception (footnote 29). They are kept and flagged. Two of them appear in the best/worst lists: Ascension St Vincent Evansville (hip/knee) and Kootenai Health (pneumonia).
 - **Associations, not causes.** For example, a higher share above 1.0 for for-profit hospitals doesn't show that ownership causes it. Patient mix, volume and specialty all differ between groups.
 
